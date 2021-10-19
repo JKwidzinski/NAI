@@ -9,6 +9,21 @@ using namespace std;
 random_device rd;
 mt19937 gen(rd());
 
+auto eggholder = [](vector<double> v){
+    double x = v.at(0), y = v.at(1);
+    return (-1)*(y+47)*sin(sqrt(abs(x/2 + y + 47))) - x*sin(sqrt(abs(x - y - 47)));
+};
+
+auto eggholder_domain = [](vector<double> v) {
+    return (abs(v[0]) <= 512) && (abs(v[1]) <= 512);
+};
+
+uniform_real_distribution<> distrib_xy(-512, 512);
+vector<double> eggholder_p0 = {
+        distrib_xy(gen),
+        distrib_xy(gen),
+};
+
 auto bukin = [](vector<double> v){
     double x = v.at(0), y = v.at(1);
     return 100*sqrt(abs(y-(0.01*pow(x,2))))+0.01*abs(x+10);
@@ -55,8 +70,10 @@ vector<double> hill_climbing(function<double(vector<double>)> f, function<bool(v
 
 int main() {
 
-    auto result = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
-    cout << result << " -> " << bukin(result) << endl;
+    auto result1 = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
+    cout << result1 << " -> " << bukin(result1) << endl;
 
+    auto result2 = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
+    cout << result2 << " -> " << eggholder(result2) << endl;
     return 0;
 }

@@ -3,11 +3,12 @@
 #include <random>
 #include <iomanip>
 #include <functional>
+#include <string>
 
 using namespace std;
 
 random_device rd;
-mt19937 gen(rd());
+mt19937 generator(rd());
 
 auto eggholder = [](vector<double> v){
     double x = v.at(0), y = v.at(1);
@@ -20,8 +21,8 @@ auto eggholder_domain = [](vector<double> v) {
 
 uniform_real_distribution<> distrib_xy(-512, 512);
 vector<double> eggholder_p0 = {
-        distrib_xy(gen),
-        distrib_xy(gen),
+        distrib_xy(generator),
+        distrib_xy(generator),
 };
 
 auto bukin = [](vector<double> v){
@@ -36,8 +37,8 @@ auto bukin_domain = [](vector<double> v) {
 uniform_real_distribution<> distrib_x(-15, -5);
 uniform_real_distribution<> distrib_y(-3, 3);
 vector<double> ackley_p0 = {
-        distrib_x(gen),
-        distrib_y(gen),
+        distrib_x(generator),
+        distrib_y(generator),
 };
 
 ostream& operator<<(ostream& o, vector<double> v)
@@ -59,12 +60,13 @@ vector<double> hill_climbing(function<double(vector<double>)> func, function<boo
     for (int i = 0; i < iterations; i++) {
         auto p2 = p1;
 
-        p2[distrib(gen)] += distrib_r(gen);
-        if (!func_domain(p2)) throw std::invalid_argument("The p2 point must be in domain");
-        double val2 = func(p2);
-        double val1 = func(p1);
-        if (val2 < val1) {
-            p1 = p2;
+        p2[distrib(generator)] += distrib_r(generator);
+        if (func_domain(p2)) {
+            double val2 = func(p2);
+            double val1 = func(p1);
+            if (val2 < val1) {
+                p1 = p2;
+            }
         }
     }
     return p1;
@@ -72,10 +74,18 @@ vector<double> hill_climbing(function<double(vector<double>)> func, function<boo
 
 int main() {
 
-    auto result1 = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
-    cout << result1 << " -> " << bukin(result1) << endl;
-
-    auto result2 = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
-    cout << result2 << " -> " << eggholder(result2) << endl;
+    string func_chosen;
+    cout << "Podaj nazwe funkcji: " << endl;
+    cin >> func_chosen;
+    if(func_chosen == "bukin"){
+        auto result1 = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
+        cout << result1 << " -> " << bukin(result1) << endl;
+    }else if(func_chosen == "eggholder"){
+        auto result2 = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
+        cout << result2 << " -> " << eggholder(result2) << endl;
+    }else{
+        cout << "Invalid argument";
+    }
+    
     return 0;
 }

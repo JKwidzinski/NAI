@@ -73,19 +73,24 @@ vector<double> hill_climbing(function<double(vector<double>)> func, function<boo
 }
 
 int main() {
-
-    string func_chosen;
-    cout << "Podaj nazwe funkcji: " << endl;
-    cin >> func_chosen;
-    if(func_chosen == "bukin"){
-        auto result1 = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
-        cout << result1 << " -> " << bukin(result1) << endl;
-    }else if(func_chosen == "eggholder"){
-        auto result2 = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
-        cout << result2 << " -> " << eggholder(result2) << endl;
-    }else{
-        cout << "Invalid argument";
+    bool active = true;
+    while(active == true){
+        string func_chosen;
+        cout << "Podaj nazwe funkcji: " << endl;
+        cin >> func_chosen;
+        if(func_chosen == "bukin"){
+            auto result1 = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
+            cout << result1 << " -> " << bukin(result1) << endl;
+            active = false;
+        }else if(func_chosen == "eggholder"){
+            auto result2 = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
+            cout << result2 << " -> " << eggholder(result2) << endl;
+            active = false;
+        }else{
+            cout << "Invalid argument" << endl;
+        }
     }
-    
+
+
     return 0;
 }

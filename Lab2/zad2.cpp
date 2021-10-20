@@ -79,12 +79,12 @@ int main() {
         cout << "Podaj nazwe funkcji: " << endl;
         cin >> func_chosen;
         if(func_chosen == "bukin"){
-            auto result1 = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
-            cout << result1 << " -> " << bukin(result1) << endl;
+            auto result = hill_climbing(bukin, bukin_domain, ackley_p0, 10000);
+            cout << result << " -> " << bukin(result) << endl;
             active = false;
         }else if(func_chosen == "eggholder"){
-            auto result2 = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
-            cout << result2 << " -> " << eggholder(result2) << endl;
+            auto result = hill_climbing(eggholder, eggholder_domain, eggholder_p0, 10000);
+            cout << result << " -> " << eggholder(result) << endl;
             active = false;
         }else{
             cout << "Invalid argument" << endl;

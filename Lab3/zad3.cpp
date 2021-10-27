@@ -41,6 +41,18 @@ vector<double> bukin_p0 = {
         distrib_y(generator),
 };
 
+auto add_rand_val = [](auto p) {
+    normal_distribution<double> rand_val(0.0, 0.3);
+    for (auto& e : p) {
+        e = e + rand_val(generator);
+    }
+    return p;
+};
+
+auto T = [](int k) {
+    return 1000.0 / k;
+};
+
 ostream& operator<<(ostream& o, vector<double> v)
 {
     for (auto e : v) {
@@ -73,38 +85,38 @@ vector<double> hill_climbing(function<double(vector<double>)> func, function<boo
 }
 
 vector<double> simulated_annealing(
-    function<double(vector<double>)> f,
-    function<bool(vector<double>)> f_domain,
+    function<double(vector<double>)> func,
+    function<bool(vector<double>)> func_domain,
     vector<double> p0,
     int iterations,
-    function<vector<double>(vector<double>)> N,
+    function<vector<double>(vector<double>)> add_rand_val,
     function<double(int)> T)
 {
-    auto s_current = p0;
-    auto s_global_best = p0;
+    auto current_point = p0;
+    auto best_point = p0;
 
-    uniform_real_distribution<> u_k(0.0, 1.0);
+    uniform_real_distribution<> distrib_u(0.0, 1.0);
 
-    if (!f_domain(s_current)) throw std::invalid_argument("The s_current point must be in domain");
+    if (!func_domain(current_point)) throw std::invalid_argument("The s_current point must be in domain");
 
-    for (int k = 0; k < iterations; k++) {
-        auto s_next = N(s_current);
-        if(f_domain(s_next)){
-            if (f(s_next) < f(s_current)) {
-                s_current = s_next;
+    for (int i = 0; i < iterations; i++) {
+        auto next_point = add_rand_val(current_point);
+        if(func_domain(next_point)){
+            if (func(next_point) < func(current_point)) {
+                current_point = next_point;
             } else {
-                double u = u_k(generator);
-                if (u < exp(-abs(f(s_next) - f(s_current)) / T(k))) {
-                    s_current = s_next;
+                double u = distrib_u(generator);
+                if (u < exp(-abs(func(next_point) - func(current_point)) / T(i))) {
+                    current_point = next_point;
                 }
             }
         }
-        if (f(s_current) < f(s_global_best)) {
-            s_global_best = s_current;
+        if (func(current_point) < func(best_point)) {
+            best_point = current_point;
         }
     }
         
-    return s_global_best;
+    return best_point;
 }
 
 
@@ -125,32 +137,12 @@ int main() {
             break;
 
         case 3:
-            result = simulated_annealing(
-                bukin, bukin_domain, bukin_p0, 10000,
-                [](auto p) {
-                    normal_distribution<double> n(0.0, 0.3);
-                    for (auto& e : p) {
-                        e = e + n(generator);
-                    }
-                    return p;
-                },
-            [](int k) { return 1000.0 / k; }
-            );
+            result = simulated_annealing(bukin, bukin_domain, bukin_p0, 10000, add_rand_val, T);
             cout << result << " -> " << bukin(result) << endl;
             break;
 
         case 4:
-            result = simulated_annealing(
-                eggholder, eggholder_domain, eggholder_p0, 10000,
-                [](auto p) {
-                    normal_distribution<double> n(0.0, 0.3);
-                    for (auto& e : p) {
-                        e = e + n(generator);
-                    }
-                    return p;
-                },
-            [](int k) { return 1000.0 / k; }
-            );
+            result = simulated_annealing(eggholder, eggholder_domain, eggholder_p0, 10000, add_rand_val, T);
             cout << result << " -> " << eggholder(result) << endl;
             break;
 

@@ -8,16 +8,24 @@ using namespace cv;
 
 int main(int argc, char **argv)
 {
-	Mat src=imread("image1.jpg");
-	namedWindow("input", WINDOW_AUTOSIZE);
+	VideoCapture cap("video.mp4");
+    if(!cap.isOpened()){
+        return -1;  
+    }   
+	namedWindow("output", WINDOW_AUTOSIZE);
 	while (true)
 	{
-		imshow("input", src);
-        	Mat dst;
-        	flip(src, dst, 1);
-		imshow("output", dst);
+        Mat frame;
+        cap >> frame;
+        if(frame.empty()){
+            break;
+        }
+        flip(frame, frame, 1);
+		imshow("output", frame);
 		if (waitKey(1) == 81)
 			break;
 	}
+    cap.release();
+    destroyAllWindows();
 	return 0;
 }

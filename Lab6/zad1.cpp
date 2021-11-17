@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 	while (true)
 	{
 		imshow("input", src);
-        Mat dst;
-        flip(src, dst, 1);
+        	Mat dst;
+        	flip(src, dst, 1);
 		imshow("output", dst);
 		if (waitKey(1) == 81)
 			break;

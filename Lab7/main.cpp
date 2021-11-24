@@ -63,7 +63,7 @@ int main( int argc, char** argv ) {
         return -1;
     }
     cout << "Video size: " << cap.get( CAP_PROP_FRAME_WIDTH ) 
-    << "x" << cap.get( CAP_PROP_FRAME_HEIGHT ) << endl;ss
+    << "x" << cap.get( CAP_PROP_FRAME_HEIGHT ) << endl;
 
     namedWindow("HSV sliders", WINDOW_AUTOSIZE);
     createTrackbar("Low Hue", "HSV sliders", &low_hue, max_value_hue, on_low_hue_trackbar);
@@ -77,23 +77,24 @@ int main( int argc, char** argv ) {
     Mat inRange_image;
     while(true){
         Mat frame;
+        int chosen_key = (waitKey( 1000.0/60.0 )&0x0ff);
         if ( cap.read( frame ) ) {
             resize(frame, frame, Size(width, height), INTER_LINEAR);
-            GaussianBlur(frame, image_blurred, Size(10, 10), 0);
+            GaussianBlur(frame, image_blurred, Size(11, 11), 0);
             cvtColor(image_blurred, image_blurred, COLOR_BGR2HSV);
             inRange(image_blurred, Scalar(low_hue, low_saturation, low_value), Scalar(high_hue, high_saturation, high_value), inRange_image);
             imshow("HSV", image_blurred);
             imshow("inRange", inRange_image);
-            if ((waitKey( 1000.0/60.0 )&0x0ff) == 120)
+            if (chosen_key == 120)
             {
 	            Rect2d rec_roi = selectROI(inRange_image);
 	            Mat img = inRange_image(rec_roi);
-                imwrite("../image.jpg", img);
+                imwrite("img.jpg", img);
             }
         } else {
             break;
         }
-        if( (waitKey( 1000.0/60.0 )&0x0ff) == 113) 
+        if( chosen_key == 113) 
         {
             break;
         }

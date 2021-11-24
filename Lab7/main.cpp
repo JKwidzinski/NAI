@@ -75,20 +75,20 @@ int main( int argc, char** argv ) {
 
     Mat image_blurred;
     Mat inRange_image;
-    do {
+    while(true){
         Mat frame;
         if ( cap.read( frame ) ) {
             resize(frame, frame, Size(width, height), INTER_LINEAR);
             GaussianBlur(frame, image_blurred, Size(10, 10), 0);
             cvtColor(image_blurred, image_blurred, COLOR_BGR2HSV);
             inRange(image_blurred, Scalar(low_hue, low_saturation, low_value), Scalar(high_hue, high_saturation, high_value), inRange_image);
-            imshow("HSV_image", image_blurred);
-            imshow("inRange_output", inRange_image);
+            imshow("HSV", image_blurred);
+            imshow("inRange", inRange_image);
             if ((waitKey( 1000.0/60.0 )&0x0ff) == 120)
             {
 	            Rect2d rec_roi = selectROI(inRange_image);
-	            Mat croppedImage = inRange_image(rec_roi);
-                imwrite("../image.jpg", croppedImage);
+	            Mat img = inRange_image(rec_roi);
+                imwrite("../image.jpg", img);
             }
         } else {
             break;
@@ -97,6 +97,6 @@ int main( int argc, char** argv ) {
         {
             break;
         }
-    } while( true );
+    }
     return 0;
 }

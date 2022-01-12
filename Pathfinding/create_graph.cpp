@@ -51,10 +51,12 @@ int getNumberOfNodes(vector<vector<int>> data){
 }
 
 vector<vector<int>> convertToAdjacencyMatrix(string path){
+    
     fstream myFile(path, ios_base::in);
     int input;
     vector<vector<int>> data;
     int i=0, j=0;
+    
     while(myFile >> input){
         data[i].push_back(input);
         j++;
@@ -63,32 +65,82 @@ vector<vector<int>> convertToAdjacencyMatrix(string path){
             j=0;
         }
     }
-    printf("%d", i);
+    
     vector<vector<int>> graph;
     int numberOfNodes = getNumberOfNodes(data);
     vector<int> row_zero;
+    
     for(int b=0; b<numberOfNodes; b++){
         row_zero.push_back(0);
     }
-    graph.push_back(row_zero);
+    
+
+    for(int b=0; b<numberOfNodes; b++){
+        graph.push_back(row_zero);
+    }
+    
     for(int n=0; n<numberOfNodes; n++){
         int nodeFrom = data[n].at(0);
         int nodeTo = data[n].at(1);
         int weight = data[n].at(2);
         graph[nodeFrom].at(nodeTo) = weight;
+        graph[nodeTo].at(nodeFrom) = weight;
     }
 
     return graph;
 }
 
+int dijkstra(vector<vector<int>> graph, int startNode, int endNode){
+    vector<int> distance(graph[0].size());
+    vector<bool> unvisited(graph[0].size());
 
-int main(int argc, char ** argv ){
-    auto path = argv[1];
-    auto dot = "graph_dot.dot"; 
+    for(int i=0; i<distance.size();i++){
+        distance[i] = INF;
+        unvisited[i] = false;
+    }
+
+    distance[startNode] = 0;
+
+    for(int i=0; i<distance.size();i++){
+        int minDistance = INF;
+        int minDistanceIndex;
+        for(int j=0;j<distance.size();j++){
+            if(distance[j]<=minDistance && unvisited[j] == false){
+                minDistance = distance[j];
+                minDistanceIndex = j;
+            }
+        }
+        unvisited[minDistanceIndex] = true;
+        for(int j=0;j<distance.size();j++){
+            if(!unvisited[j] 
+            && graph[minDistanceIndex][j] 
+            && distance[minDistanceIndex]!=INF 
+            && distance[minDistanceIndex]+graph[minDistanceIndex][j]<distance[j]){
+                distance[j]=distance[minDistanceIndex]+graph[minDistanceIndex][j];
+            }
+        }
+    }
+
+    return distance[endNode];
+}
+
+
+
+int main(int argc, char* argv[]){
+    string path = argv[1];
+    //auto dot = "graph_dot.dot"; 
     //string graph = argv[2];
     //generate_dot(path, dot);
     //create_graph(dot, graph);
     auto graph_adjacency = convertToAdjacencyMatrix(path);
-    printf("%d", graph_adjacency[0].at(1));
+    vector<vector<int>> graph = {
+        {0, 1, 2, 0, 0, 0},
+        {1, 0, 0, 5, 1, 0},
+        {2, 0, 0, 2, 3, 0},
+        {0, 5, 2, 0, 2, 2},
+        {0, 1, 3, 2, 0, 1},
+        {0, 0, 0, 2, 1, 0}};
+    auto distance = dijkstra(graph_adjacency, 0, 3);
+    cout << distance;
     return 0;
 }

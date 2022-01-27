@@ -36,15 +36,15 @@ void create_graph(string dot, string graph){
     system(cmd);
 }
 
-int getNumberOfNodes(vector<vector<int>> data){
+int getNumberOfNodes(vector<int> data){
     vector<int> nodes;
-    for(int i = 0; i<data.size();i++){
-        nodes.push_back(data[i].at(0));
+    for(int i = 0; i<data.size(); i+=3){
+        nodes.push_back(data.at(i+1));
     }
-    int numberOfNodes;
+    int numberOfNodes = nodes[0];
     for(int i = 1; i<nodes.size();i++){
-        if(nodes[i] > numberOfNodes){
-            numberOfNodes = nodes[i];
+        if(nodes.at(i) > numberOfNodes){
+            numberOfNodes = nodes.at(i);
         }
     }
     return numberOfNodes+1;
@@ -53,21 +53,14 @@ int getNumberOfNodes(vector<vector<int>> data){
 vector<vector<int>> convertToAdjacencyMatrix(string path){
     
     fstream myFile(path, ios_base::in);
-    int input;
-    vector<vector<int>> data;
-    int i=0, j=0;
-    
-    while(myFile >> input){
-        data[i].push_back(input);
-        j++;
-        if(j == 3){
-            i++;
-            j=0;
-        }
+    int inputd;
+    vector<int> d;
+    while(myFile >> inputd){
+        d.push_back(inputd);
     }
+    int numberOfNodes = getNumberOfNodes(d);
     
     vector<vector<int>> graph;
-    int numberOfNodes = getNumberOfNodes(data);
     vector<int> row_zero;
     
     for(int b=0; b<numberOfNodes; b++){
@@ -79,14 +72,13 @@ vector<vector<int>> convertToAdjacencyMatrix(string path){
         graph.push_back(row_zero);
     }
     
-    for(int n=0; n<numberOfNodes; n++){
-        int nodeFrom = data[n].at(0);
-        int nodeTo = data[n].at(1);
-        int weight = data[n].at(2);
+    for(int n=0; n<d.size();n+=3){
+        int nodeFrom = d.at(n);
+        int nodeTo = d.at(n+1);
+        int weight = d.at(n+2);
         graph[nodeFrom].at(nodeTo) = weight;
         graph[nodeTo].at(nodeFrom) = weight;
     }
-
     return graph;
 }
 
@@ -127,20 +119,15 @@ int dijkstra(vector<vector<int>> graph, int startNode, int endNode){
 
 
 int main(int argc, char* argv[]){
-    string path = argv[1];
+    auto path = argv[1];
     //auto dot = "graph_dot.dot"; 
     //string graph = argv[2];
     //generate_dot(path, dot);
     //create_graph(dot, graph);
     auto graph_adjacency = convertToAdjacencyMatrix(path);
-    vector<vector<int>> graph = {
-        {0, 1, 2, 0, 0, 0},
-        {1, 0, 0, 5, 1, 0},
-        {2, 0, 0, 2, 3, 0},
-        {0, 5, 2, 0, 2, 2},
-        {0, 1, 3, 2, 0, 1},
-        {0, 0, 0, 2, 1, 0}};
-    auto distance = dijkstra(graph_adjacency, 0, 3);
+    int startNode = stoi(argv[2]);
+    int endNode = stoi(argv[3]);
+    auto distance = dijkstra(graph_adjacency, startNode, endNode);
     cout << distance;
     return 0;
 }
